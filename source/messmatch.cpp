@@ -57,29 +57,76 @@ bool TMessMatch::LocalMatch(TSyslogMessage * p)
 
   // rule 1
   bool b = true;
-  for(int i=0; i<Text1->Count; i++)
+  if( Contains1 )
   {
-    if( MatchAllFilds(p, Field1, Contains1, Text1->Strings[i]) )
+    // "contains" mode: at least one string must match (OR logic)
+    b = true;
+    for(int i=0; i<Text1->Count; i++)
     {
-      b = true;
-      break;
+      if( MatchAllFilds(p, Field1, Contains1, Text1->Strings[i]) )
+      {
+        b = true;
+        break;
+      }
+      b = false;
     }
-    b = false;
+  }
+  else
+  {
+    // "NOT contains" mode: ALL strings must NOT match (AND logic)
+    b = true;
+    for(int i=0; i<Text1->Count; i++)
+    {
+      if( MatchAllFilds(p, Field1, Contains1, Text1->Strings[i]) )
+      {
+        // Found a string that is NOT contained - this condition passes
+        // But we need to check ALL strings
+      }
+      else
+      {
+        // Found a string that IS contained - filter fails
+        b = false;
+        break;
+      }
+    }
   }
   // strings count > 0 and all strings not match
   if( ! b )
     return false;
 
   // rule 2
-  b = true;
-  for(int i=0; i<Text2->Count; i++)
+  if( Contains2 )
   {
-    if( MatchAllFilds(p, Field2, Contains2, Text2->Strings[i]) )
+    // "contains" mode: at least one string must match (OR logic)
+    b = true;
+    for(int i=0; i<Text2->Count; i++)
     {
-      b = true;
-      break;
+      if( MatchAllFilds(p, Field2, Contains2, Text2->Strings[i]) )
+      {
+        b = true;
+        break;
+      }
+      b = false;
     }
-    b = false;
+  }
+  else
+  {
+    // "NOT contains" mode: ALL strings must NOT match (AND logic)
+    b = true;
+    for(int i=0; i<Text2->Count; i++)
+    {
+      if( MatchAllFilds(p, Field2, Contains2, Text2->Strings[i]) )
+      {
+        // Found a string that is NOT contained - this condition passes
+        // But we need to check ALL strings
+      }
+      else
+      {
+        // Found a string that IS contained - filter fails
+        b = false;
+        break;
+      }
+    }
   }
   if( ! b )
     return false;
