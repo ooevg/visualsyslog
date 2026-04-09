@@ -53,12 +53,71 @@ Installer adds firewall exception.
 
 Building from sources
 ===
-To build Windows Syslog Server from sources use CodeGear RAD Studio C++Builder 2007  
-Main project file _visualsyslog.cbproj_  
-Required components: [Indy.Sockets (VCL) version 10](http://www.indyproject.org/Sockets/index.EN.aspx)
 
-To build the installer, use Inno Setup Compiler 5.5.1(a)  
-Installer project file _visualsyslog.iss_
+### Building on Windows (Native)
+
+To build Visual Syslog Server for Windows from sources:
+
+1. **Requirements:**
+   - CodeGear RAD Studio C++Builder 2007 or compatible version
+   - Indy.Sockets (VCL) version 10 components (http://www.indyproject.org/Sockets/index.EN.aspx)
+   - Inno Setup Compiler 5.5.1(a) (optional, for building installer)
+
+2. **Build steps:**
+   - Open `visualsyslog.cbproj` in C++Builder
+   - Build the project (Ctrl+F9 or Project → Build)
+   - The executable will be created in the output directory
+
+3. **Building installer (optional):**
+   - Open `visualsyslog.iss` in Inno Setup Compiler
+   - Compile the script to create the setup executable
+
+### Building on Linux/Unix (Cross-compilation for Windows)
+
+To cross-compile for Windows from Linux:
+
+1. **Install MinGW-w64:**
+   ```bash
+   # Debian/Ubuntu
+   sudo apt-get install mingw-w64
+   
+   # Fedora/RHEL
+   sudo dnf install mingw-w64
+   ```
+
+2. **Install Qt for Windows (if using Qt-based build system):**
+   - Download Qt for Windows MinGW from https://www.qt.io/download
+   - Or use existing Qt installation with MinGW toolchain
+
+3. **Configure and build:**
+   ```bash
+   # Create build directory
+   mkdir build-win && cd build-win
+   
+   # Configure with CMake for Windows target
+   cmake .. -DCMAKE_TOOLCHAIN_FILE=/path/to/mingw-toolchain.cmake \
+            -DCMAKE_BUILD_TYPE=Release
+   
+   # Build
+   cmake --build . --config Release
+   ```
+
+4. **Deploy:**
+   - Copy required DLLs (Qt libraries, etc.) alongside the executable
+   - Use `windeployqt` tool if using Qt:
+     ```bash
+     windeployqt visualsyslog.exe
+     ```
+
+**Note:** This project was originally developed for C++Builder. For cross-platform builds, you may need to adapt the build system (e.g., create CMakeLists.txt) and ensure compatibility with standard C++ libraries.
+
+### Alternative: Using Docker
+
+You can also build in a Docker container with pre-configured Windows toolchain:
+
+```bash
+docker run --rm -v $(pwd):/src -w /src mxeenv make
+```
 
 Support
 ===
